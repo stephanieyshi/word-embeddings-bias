@@ -1,6 +1,6 @@
 # Data
 
-Our data comes from a number of sources.  The first source is from the *Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings* paper.
+Our data comes from a number of sources.  The first source is from the *Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings* paper. Since there is no gold standard, we do not have any test or gold standard datasets.
 
 ### Debiasing Word Embeddings Paper:
 
@@ -15,4 +15,3 @@ Our data comes from a number of sources.  The first source is from the *Man is t
 - professions.json contains a list of professions and their respective direction towards a particular gender (positive values for male, negative for female)
 
 - GoogleNews-vectors-negative300.bin.gz is the (zipped) file containing the existing embeddings the paper debiases.  The files can be downloaded [here](https://drive.google.com/drive/folders/0B5vZVlu2WoS5dkRFY19YUXVIU2M).
-

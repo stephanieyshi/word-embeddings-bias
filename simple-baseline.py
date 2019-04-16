@@ -2,8 +2,7 @@ import json
 import numpy as np
 from sklearn.decomposition import PCA
 
-from scoring import *
-
+from scoring.scoring import *
 
 def get_embedding_dict(filename):
     with open(filename, 'r') as f:
@@ -43,7 +42,6 @@ def get_gender_direction(embedding_dict, pairs_file):
     pairs = read_json(pairs_file)
     pca = get_pca(pairs, embedding_dict)
 
-    #print(pca.explained_variance_ratio_)
     return pca.components_[0]
 
 
@@ -66,12 +64,11 @@ def main():
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words]
     professions = [data[0] for data in read_json('data/professions.json')]
 
-    # direct_bias = get_direct_bias(embedding_dict, g, professions)
-    # print("Direct Bias: " + str(direct_bias))
+    direct_bias = get_direct_bias(embedding_dict, g, professions)
+    print("Direct Bias: " + str(direct_bias))
 
     neutral_pairs = read_json('data/equalize_pairs.json')
-    # pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
-    pairs = [['businessman', 'football'], ['businessman', 'softball']]
+    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
 
