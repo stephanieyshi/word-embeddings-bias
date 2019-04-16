@@ -56,7 +56,6 @@ def get_neutral_embeddings(embedding_dict, gender_specific_words):
     return neutral_words,neutral_embeddings
 
 
-
 def main():
     embedding_dict = get_embedding_dict('embeddings/w2v_gnews_small.txt')
     g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
@@ -64,13 +63,21 @@ def main():
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words]
     professions = [data[0] for data in read_json('data/professions.json')]
 
-    direct_bias = get_direct_bias(embedding_dict, g, professions)
+    biased_biases = get_biases(embedding_dict, g, professions)
+    direct_bias = np.mean(biased_biases)
+    # direct_bias = get_direct_bias(embedding_dict, g, professions)
     print("Direct Bias: " + str(direct_bias))
 
     neutral_pairs = read_json('data/equalize_pairs.json')
     pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
+
+    # Compute the Pearson Correlation for biased embeddings vs de-biased embeddings
+    # TODO: Implement unbiased_biases or read in unbiased embeddings
+    unbiased_biases = biased_biases
+    pearson_correlation, p_value = get_pearson_correlation(biased_biases, unbiased_biases)
+    print("Pearson Correlation: " + str(pearson_correlation) + " with p_value: " + str(p_value))
 
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@ import json
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn import preprocessing
+from scipy.stats import pearsonr
 
 def compute_cosine_similarity(v1, v2):
   dot = np.dot(v1, v2)
@@ -11,6 +12,24 @@ def compute_cosine_similarity(v1, v2):
   return dot / (l1 * l2)
 
 
+# Computes the Pearson correlation between vectors of biases
+# v1: unbiased biases
+# v2: de-biased biases
+def get_pearson_correlation(v1, v2):
+  corr, p_value = pearsonr(v1, v2)
+  return corr, p_value
+
+
+# Returns a vector of biases given an embedding_dict and gender direction g
+def get_biases(embedding_dict, g, words, c=1):
+  biases = []
+  for word in words:
+    biases.append(abs(compute_cosine_similarity(embedding_dict[word], g)) ** c)
+
+  return biases
+
+
+# Deprecated? Can get mean of the actual vector of biases
 def get_direct_bias(embedding_dict, g, words, c=1):
 	bias = 0
 	N = len(words)
