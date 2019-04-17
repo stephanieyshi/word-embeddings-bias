@@ -7,7 +7,7 @@ Note: the scoring file cannot be run separately without a baseline model since t
 ### Direct Bias
 We first aim to measure direct bias, as described in Man is to Computer Programmer (Bolukbasi et al. 2016). They use the following metric:
 
-<img src="https://latex.codecogs.com/gif.latex?\text{DirectBias}_c&space;=&space;frac{1}{|N|}&space;sum_{w&space;in&space;N}&space;|cos(hat{w},&space;g)|^cs" />
+<img src="https://latex.codecogs.com/gif.latex?\text{DirectBias}_c&space;=&space;\frac{1}{|N|}&space;sum_{w&space;in&space;N}&space;|cos(hat{w},&space;g)|^cs" />
 
 where <img src="https://latex.codecogs.com/gif.latex?c" /> is a strictness parameter, where <img src="https://latex.codecogs.com/gif.latex?g" />  is a learned gender direction, and where <img src="https://latex.codecogs.com/gif.latex?N" />  is the set of gender neutral words. A higher value indicates more bias, while a lower value indicates less indirect bias.
 
@@ -23,4 +23,3 @@ where <img src="https://latex.codecogs.com/png.latex?w_g&space;=&space;(w&space;
 In Lipstick on a Pig (Gonen et al. 2019), Pearson correlation is used to measure the similarity in biases between embeddings before debiasing and embeddings after debiasing.  It is defined as:
 
 <img src="https://www.statisticshowto.datasciencecentral.com/wp-content/uploads/2012/10/pearson.gif" />
-
