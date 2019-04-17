@@ -28,4 +28,4 @@ Our data comes from a number of sources.  The first source is from the *Man is t
 
 - Brown corpus case-insensitive word2vec embeddings. It can be downloaded [here](https://data.world/jaredfern/brown-corpus).
 
-- Fasttext 1 million word vectors trained on Wikipedia 2017, UMBC webbase corpus and statmt.org news dataset. It can be downloaded [here](https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki-news-300d-1M.vec.zip\).
+- Fasttext 1 million word vectors trained on Wikipedia 2017, UMBC webbase corpus and statmt.org news dataset. It can be downloaded [here](https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki-news-300d-1M.vec.zip).
