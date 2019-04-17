@@ -14,9 +14,9 @@ where <img src="https://latex.codecogs.com/gif.latex?c" /> is a strictness param
 ### Indirect Bias
 Another metric of bias used in Bolukbasi et al. 2016 is indirect bias, which is measured as follows:
 
-<img src="https://latex.codecogs.com/png.latex?\beta(w,&space;v)&space;=&space;\frac{\left(&space;w&space;\cdot&space;v&space;-&space;\frac{w_\perp&space;\cdot&space;v_\perp}{\left\lVert&space;w_\perp\right\rVert_2&space;\left\lVert&space;v_\perp\right\rVert_2}\right&space;)&space;}{w&space;\cdot&space;v}"/>
+<img src="https://latex.codecogs.com/gif.latex?\beta(w,&space;v)&space;=&space;\frac{\left(&space;w&space;\cdot&space;v&space;-&space;\frac{w_\perp&space;\cdot&space;v_\perp}{\left\lVert&space;w_\perp\right\rVert_2&space;\left\lVert&space;v_\perp\right\rVert_2}\right&space;)&space;}{w&space;\cdot&space;v}"/>
 
-where <img src="https://latex.codecogs.com/png.latex?w_g&space;=&space;(w&space;\cdot&space;g)&space;g" /> and <img src="https://latex.codecogs.com/png.latex?w_\perp&space;=&space;w&space;-&space;w_g" />. A higher magnitude indicates more bias, while a lower magnitude indicates less indirect bias.
+where <img src="https://latex.codecogs.com/gif.latex?w_g&space;=&space;(w&space;\cdot&space;g)&space;g" /> and <img src="https://latex.codecogs.com/gif.latex?w_\perp&space;=&space;w&space;-&space;w_g" />. A higher magnitude indicates more bias, while a lower magnitude indicates less indirect bias.
 
 ## Secondary Metric: Correlation
 ### Pearson Correlation
