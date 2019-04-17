@@ -15,3 +15,17 @@ Our data comes from a number of sources.  The first source is from the *Man is t
 - professions.json contains a list of professions and their respective direction towards a particular gender (positive values for male, negative for female)
 
 - GoogleNews-vectors-negative300.bin.gz is the (zipped) file containing the existing embeddings the paper debiases.  The files can be downloaded [here](https://drive.google.com/drive/folders/0B5vZVlu2WoS5dkRFY19YUXVIU2M).
+
+### Other Sources:
+
+- Word embeddings from the New York Times Annotated Corpus (Sandhaus, 2008) trained using the GLoVe algorithm. These files can be downloaded [here](http://stanford.edu/~nkgarg/NYTembeddings/).
+
+- Embeddings trained from a combination of the Wikipedia 2014 dump and the Gigaword 5 corpus using the GLoVe algorithm. The 6B token, 400K vocab version can be downloaded [here](http://nlp.stanford.edu/data/glove.6B.zip). The 42B token, 1.9M vocab version can be downloaded [here](http://nlp.stanford.edu/data/glove.42B.300d.zip). The 840B, 2.2M vocab version can be downloaded [here](http://nlp.stanford.edu/data/glove.840B.300d.zip).
+
+- Twitter embeddings trained using the GLoVe algorithm. These files can be downloaded [here](http://nlp.stanford.edu/data/glove.twitter.27B.zip).
+
+- Word embeddings for historical English text (Hamilton, Leskovec, and Jurafsky, 2018) spanning all decades from 1800 to 2000. These are derived from Google N-Gram word2vec vectors and can be downloaded [here](http://snap.stanford.edu/historical_embeddings/eng-all_sgns.zip).
+
+- Brown corpus case-insensitive word2vec embeddings. It can be downloaded [here](https://data.world/jaredfern/brown-corpus).
+
+- Fasttext 1 million word vectors trained on Wikipedia 2017, UMBC webbase corpus and statmt.org news dataset. It can be downloaded [here](https://s3-us-west-1.amazonaws.com/fasttext-vectors/wiki-news-300d-1M.vec.zip\).
