@@ -195,6 +195,9 @@ if __name__ == '__main__':
     professions_file = '../data/professions.json'
     biased_female_file = '../data/biased_female_500.txt'
     biased_male_file = '../data/biased_male_500.txt'
+    original_biases_file = '../data/professions_biases.txt'
+    word_similarity_file = '../data/combined.csv'
+    analogies_file = '../data/google_analogies.txt'
 
     embedding_dict = get_embedding_dict(embeddings_file)
     g = get_gender_direction(gender_direction_file)
@@ -223,13 +226,13 @@ if __name__ == '__main__':
     print()
 
     #get original biases and compute pearson
-    original_biases = [float(val) for val in get_words('../data/professions_biases.txt')]
+    original_biases = [float(val) for val in get_words(original_biases_file)]
     pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
     print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
     print()
 
     #word similarity task
-    similarity_pairs = read_wordsim('../data/combined.csv')
+    similarity_pairs = read_wordsim(word_similarity_file)
     similarity_pairs = {key:similarity_pairs[key] for key in similarity_pairs 
                             if key[0] in embedding_dict and key[1] in embedding_dict}
 
@@ -240,7 +243,7 @@ if __name__ == '__main__':
     print("Spearman Correlation for WS: " + str(spearman.correlation))
     print()
 
-    analogies = get_analogies('../data/google_analogies.txt')
+    analogies = get_analogies(analogies_file)
     analogies = random.sample([tup for tup in analogies if tup[0] in embedding_dict and tup[1] in embedding_dict and
                                                            tup[2] in embedding_dict and tup[3] in embedding_dict], 100)
 

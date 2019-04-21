@@ -3,6 +3,16 @@ There are several evaluation metrics, which tend to relate to vector distance, t
 
 Note: the scoring file cannot be run separately without a baseline model since there is no "gold standard". To run the baseline, enter `python3 simple-baseline.py` in the command line.
 
+The following data files are needed (with associated variables in scoring.py) to run the evaluation:
+* embeddings to evaluate: embeddings_file
+* gender directional vector: gender_direction_file
+* list of professions: professions_file
+* list of 500 most biased female words: biased_female_file
+* list of 500 most biased male words: biased_male_file
+* biases of each word from original non-debiased embeddings: original_biases_file
+* list of word pairs with similarity score: word_similarity_file
+* list of word tuples that form analogies: analogies_file
+
 ## Primary Metrics: Projection
 ### Direct Bias
 We first aim to measure direct bias, as described in Man is to Computer Programmer (Bolukbasi et al. 2016). They use the following metric:

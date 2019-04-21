@@ -1,5 +1,5 @@
-# Baseline
-Our baseline measures direct bias and indirect bias on undebiased embeddings.
+# Simple Baseline
+Our simple baseline measures direct bias and indirect bias on undebiased (in their original form) embeddings. We also measure its performance on word similarity and analogy-solving tasks.
 
 ## Direct Bias
 We find that the Google News embeddings set has a direct bias of 8%.
