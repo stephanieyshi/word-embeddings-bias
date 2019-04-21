@@ -186,7 +186,6 @@ def main():
     gender_specific_words = read_json('data/gender_specific_full.json')
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
     equalize_pairs = read_json('data/equalize_pairs.json')
-    professions = [data[0] for data in read_json('data/professions.json')]
 
     #HARD DEBIASING
     embedding_dict = debias(embedding_dict, g, gender_neutral_words)
@@ -197,15 +196,7 @@ def main():
     #FINDING MOST BIASED WORDS
     #female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
     #male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
-    #print("Most Biased Female Words")
-    #for word in sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:10]:
-    #    print(word + ": " + str(female_bias_dict[word]))
-    #print()
     #write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/biased_female_500.txt')
-    #print("Most Biased Male Words")
-    #for word in sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:10]:
-    #    print(word + ": " + str(male_bias_dict[word]))
-    #print()
     #write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/biased_male_500.txt')
     #top 1000 biased words
     #most_biased_words = sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500] + sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500]

@@ -16,6 +16,12 @@ Our data comes from a number of sources.  The first source is from the *Man is t
 
 - GoogleNews-vectors-negative300.bin.gz is the (zipped) file containing the existing embeddings the paper debiases.  The files can be downloaded [here](https://drive.google.com/drive/folders/0B5vZVlu2WoS5dkRFY19YUXVIU2M).
 
+### Word Similarity and Analogy Task Data
+
+- combined.csv contains a list of word pairs along with human-assigned similarity ratings from the WordSimilarity-353 collection.
+
+- google_analogies.txt contains a list of word tuples that form analogies from the Google analogy test set.
+
 ### Other Sources:
 
 - Word embeddings from the New York Times Annotated Corpus (Sandhaus, 2008) trained using the GLoVe algorithm. These files can be downloaded [here](http://stanford.edu/~nkgarg/NYTembeddings/).

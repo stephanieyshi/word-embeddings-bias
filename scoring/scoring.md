@@ -18,8 +18,22 @@ Another metric of bias used in Bolukbasi et al. 2016 is indirect bias, which is 
 
 where <img src="https://latex.codecogs.com/gif.latex?w_g&space;=&space;(w&space;\cdot&space;g)&space;g" /> and <img src="https://latex.codecogs.com/gif.latex?w_\perp&space;=&space;w&space;-&space;w_g" />. A higher magnitude indicates more bias, while a lower magnitude indicates less indirect bias.
 
-## Secondary Metric: Correlation
+## Secondary Metrics: Clustering and Correlation
+
+### Clustering Accuracy
+In Lipstick on a Pig (Gonen et al. 2019), clustering accuracy is used to observe the ability to observe bias in embeddings. Particularly, the 1000 most biased words are obtained (500 female and 500 male), and are then clustered using PCA and KMeans.
+
 ### Pearson Correlation
 In Lipstick on a Pig (Gonen et al. 2019), Pearson correlation is used to measure the similarity in biases between embeddings before debiasing and embeddings after debiasing.  It is defined as:
 
 <img src="https://www.statisticshowto.datasciencecentral.com/wp-content/uploads/2012/10/pearson.gif" />
+
+## NLP Task Perforamce: Word Similarity and Analogy-Solving
+In Man is to Computer Programmer as Woman is to Homemaker? (Bolukbasi et al. 2016), an analysis of the embeddings quality is performed by using said embeddings on a word similarity task and an analogy-solving task.
+
+### Word Similarity: Spearman Correlation
+Using cosine similarity, the embeddings are utilized to measure the similarity of word pairs. These scores are then compared with human-assigned similarity ratings using Spearman Correlation, which is a nonparametric measure of rank correlation.
+
+### Analogy-Solving: Accuracy
+Again, using cosine similarity, the embeddings are utilized to solve analogies of the form a is to b as x is to y, when given a,b, and x. The embeddings performance is measured by ability to accurately predict the solution to the analogy (whose solution is contained in a Google dataset).
+
