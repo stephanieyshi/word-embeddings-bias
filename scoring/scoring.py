@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn import preprocessing
 from scipy.stats import pearsonr
+from scipy import stats
 import csv
 
 def get_embedding_dict(filename):
@@ -43,9 +44,12 @@ def get_words(filename):
 
     return lines[:len(lines) - 1]
 
+
 def read_wordsim(filename):
     pairs_dict = dict()
     with open(filename) as csvfile:
+        #skip first row
+        next(csvfile)
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             pairs_dict[(row[0], row[1])] = row[2]
@@ -127,6 +131,7 @@ def plotPCA(embedding_dict, words):
     for i in range(len(X)):
         ax.scatter(points[i, 0], points[i, 1], c=cdict[i][0], marker=cdict[i][1])
 
+    #uncomment to see PCA plot with clustering
     #plt.show()
 
     return labels
@@ -138,6 +143,10 @@ def get_clustering_accuracy(labels):
     accuracy = correct / len(labels)
 
     return max(accuracy, 1 - accuracy)
+
+
+def get_similarities(embedding_dict, pairs):
+    return {pair:compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]]) for pair in pairs}
 
 
 if __name__ == '__main__':
@@ -178,8 +187,17 @@ if __name__ == '__main__':
     original_biases = [float(val) for val in get_words('../data/professions_biases.txt')]
     pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
     print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
+    print()
 
+    #word similarity task
+    similarity_pairs = read_wordsim('../data/combined.csv')
+    similarity_pairs = {key:similarity_pairs[key] for key in similarity_pairs 
+                            if key[0] in embedding_dict and key[1] in embedding_dict}
 
+    similarity_dict = get_similarities(embedding_dict, list(similarity_pairs.keys()))
+    spearman = stats.spearmanr([float(val) for val in similarity_pairs.values()], 
+                               [float(val) for val in similarity_dict.values()])
 
+    print("Spearman Correlation for WS: " + str(spearman.correlation))
 
 
