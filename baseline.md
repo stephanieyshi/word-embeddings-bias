@@ -6,7 +6,7 @@ Our baseline measures direct bias and indirect bias on debiased embeddings along
 * gender-specific words file: data/gender_specific_full.json
 * pairs of gender-equivalent words file: data/equalize_pairs.json
 
-The baseline can be executed by running `python3 simple-baseline.py` in terminal. The resulting debiased embeddings should end up in: embeddings/debiased_w2v_gnews_small.txt
+The baseline can be executed by running `python3 baseline.py` in terminal. The resulting debiased embeddings should end up in: embeddings/debiased_w2v_gnews_small.txt
 
 ## Results 
 ### Direct Bias
