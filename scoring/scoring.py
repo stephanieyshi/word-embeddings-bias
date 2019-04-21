@@ -3,6 +3,16 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn import preprocessing
 from scipy.stats import pearsonr
+import csv
+
+def read_wordsim(filename):
+    pairs_dict = dict()
+    with open(filename) as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+        for row in reader:
+            pairs_dict[(row[0], row[1])] = row[2]
+
+    return pairs_dict
 
 def compute_cosine_similarity(v1, v2):
   dot = np.dot(v1, v2)
@@ -53,3 +63,8 @@ def get_indirect_bias(embedding_dict, g, pairs):
         bias[(pair[0], pair[1])] = beta
 
     return bias
+
+
+if __name__ == '__main__':
+  pairs_dict = read_wordsim('combined.csv')
+  print(pairs_dict)

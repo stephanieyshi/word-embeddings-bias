@@ -1,8 +1,10 @@
 import json
 import numpy as np
 from sklearn.decomposition import PCA
-
 from scoring.scoring import *
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
 
 def get_embedding_dict(filename):
     with open(filename, 'r') as f:
@@ -33,7 +35,7 @@ def get_pca(pairs, embedding_dict):
         X.append(embedding_dict[pair[1]] - center)
 
     pca = PCA(n_components=10)
-    components = pca.fit(X)
+    pca.fit(X)
 
     return pca
 
@@ -89,6 +91,7 @@ def equalize(embedding_dict, g, pairs):
 
     return embedding_dict
 
+#FIX THIS
 def generate_analogies(embedding_dict, g, words):
     analogies_dict = dict()
     for i in range(len(words)):
@@ -101,14 +104,89 @@ def generate_analogies(embedding_dict, g, words):
 
     return analogies_dict
 
-                     
+
+def most_biased(embedding_dict, g, words, dir=True):
+    bias_dict = dict()
+
+    for word in words:
+        vector = embedding_dict[word]
+        proj = g * np.dot(vector, g) / np.dot(g, g)
+
+        #direction of projection determines gender
+        direction = np.linalg.norm(g - proj) - np.linalg.norm(g) > 0
+
+        if direction == dir:
+            bias = -1 * np.linalg.norm(proj)
+        else:
+            bias = np.linalg.norm(proj)
+
+        bias_dict[word] = bias
+
+    return bias_dict
+
+
+def get_kmeans(points):
+    kmeans = KMeans(n_clusters=2, random_state=0).fit(points)
+    labels = kmeans.labels_
+    return labels
+
+def plotPCA(embedding_dict, words):
+    X = []
+
+    for word in words:
+        X.append(embedding_dict[word])
+
+    pca = PCA(n_components=2)
+    points = pca.fit_transform(X)
+
+    labels = get_kmeans(points)
+
+    cdict = {i:['red','*'] if i < 500 else ['blue', 'o'] for i in range(len(X))}
+
+    fig,ax = plt.subplots(figsize=(8,8))
+    for i in range(len(X)):
+        ax.scatter(points[i, 0], points[i, 1], c=cdict[i][0], marker=cdict[i][1])
+
+    #plt.show()
+
+    return labels
+
+def get_clustering_accuracy(labels):
+    correct_labels = [1 if i < 500 else 0 for i in range(len(labels))]
+    correct = sum(correct_labels == labels)
+    accuracy = correct / len(labels)
+
+    return max(accuracy, 1 - accuracy) 
+
+
+def solve_analogy(embedding_dict):
+    vector = embedding_dict['hospital'] - embedding_dict['doctor'] + embedding_dict['teacher']
+
+    solution_dict = dict()
+
+    for word in embedding_dict:
+        solution_dict[word] = compute_cosine_similarity(vector, embedding_dict[word])
+
+    return solution_dict
+
+
+def write_embeddings_to_file(embedding_dict, filename):
+    with open(filename, 'w') as f:
+        for word in embedding_dict:
+            f.write(word + " ")
+            vector = ["{0:.7f}".format(val) for val in embedding_dict[word]]
+            vector_string = " ".join(vector)
+            f.write(vector_string + "\n")
+
+
+
 
 def main():
     #collect data
     embedding_dict = get_embedding_dict('embeddings/w2v_gnews_small.txt')
     g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
     gender_specific_words = read_json('data/gender_specific_full.json')
-    gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words]
+    gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
     equalize_pairs = read_json('data/equalize_pairs.json')
     professions = [data[0] for data in read_json('data/professions.json')]
 
@@ -116,40 +194,63 @@ def main():
     print("++++++ORIGINAL EMBEDDINGS++++++")
 
     #pre-debiasing results
-    biased_biases = get_biases(embedding_dict, g, professions)
-    direct_bias = np.mean(biased_biases)
-    print("Direct Bias: " + str(direct_bias))
-    print()
-
-    neutral_pairs = read_json('data/equalize_pairs.json')
-    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
-    indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
-    print("Indirect Bias: " + str(indirect_bias))
-    print()
-
-    print(len(gender_neutral_words))
-    analogies_dict = generate_analogies(embedding_dict, g, gender_neutral_words[10000:11000])
-
-
-
-
-
-    #print("++++++HARD-DEBIASED EMBEDDINGS++++++")
-    ##debiasing
-    #embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    #embedding_dict = equalize(embedding_dict, g, equalize_pairs)
-#
-#
-#
-    #unbiased_biases = get_biases(embedding_dict, g, professions)
-    #direct_bias = np.mean(unbiased_biases)
+    #biased_biases = get_biases(embedding_dict, g, professions)
+    #direct_bias = np.mean(biased_biases)
     #print("Direct Bias: " + str(direct_bias))
+    #print()
+#
+    #neutral_pairs = read_json('data/equalize_pairs.json')
+    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
     #indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     #print("Indirect Bias: " + str(indirect_bias))
     #print()
+
+    #true = female, false = male
+    female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
+    male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
+
+    #print("Most Biased Female Words")
+    #for word in sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:10]:
+    #    print(word + ": " + str(female_bias_dict[word]))
+    #print()
+
+
+    #print("Most Biased Male Words")
+    #for word in sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:10]:
+    #    print(word + ": " + str(male_bias_dict[word]))
+    #print()
+
+    #top 1000 biased words
+    most_biased_words = sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500] + sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500]
+    #labels = plotPCA(embedding_dict, most_biased_words)
 #
-    #
+    #print("Clustering Accuracy: " + str(get_clustering_accuracy(labels)))
+    #print()
 #
+    #analogies_dict = solve_analogy(embedding_dict)
+    #print(sorted(analogies_dict, key=analogies_dict.get, reverse=True)[:10])
+#
+#
+    #print("++++++HARD-DEBIASED EMBEDDINGS++++++")
+    ##debiasing
+    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
+
+    unbiased_biases = get_biases(embedding_dict, g, professions)
+    direct_bias = np.mean(unbiased_biases)
+    print("Direct Bias: " + str(direct_bias))
+    indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
+    print("Indirect Bias: " + str(indirect_bias))
+    print()
+    labels = plotPCA(embedding_dict, most_biased_words)
+    print("Clustering Accuracy: " + str(get_clustering_accuracy(labels)))
+    print()
+#
+    #analogies_dict = solve_analogy(embedding_dict)
+    #print(sorted(analogies_dict, key=analogies_dict.get, reverse=True)[:10])
+
+    
+
     ## Compute the Pearson Correlation for biased embeddings vs de-biased embeddings
     #pearson_correlation, p_value = get_pearson_correlation(biased_biases, unbiased_biases)
     #print("Pearson Correlation: " + str(pearson_correlation) + " with p_value: " + str(p_value))
