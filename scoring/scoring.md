@@ -28,12 +28,12 @@ In Lipstick on a Pig (Gonen et al. 2019), Pearson correlation is used to measure
 
 <img src="https://www.statisticshowto.datasciencecentral.com/wp-content/uploads/2012/10/pearson.gif" />
 
-## NLP Task Perforamce: Word Similarity and Analogy-Solving
+## NLP Task Performance: Word Similarity and Analogy-Solving
 In Man is to Computer Programmer as Woman is to Homemaker? (Bolukbasi et al. 2016), an analysis of the embeddings quality is performed by using said embeddings on a word similarity task and an analogy-solving task.
 
 ### Word Similarity: Spearman Correlation
 Using cosine similarity, the embeddings are utilized to measure the similarity of word pairs. These scores are then compared with human-assigned similarity ratings using Spearman Correlation, which is a nonparametric measure of rank correlation.
 
 ### Analogy-Solving: Accuracy
-Again, using cosine similarity, the embeddings are utilized to solve analogies of the form a is to b as x is to y, when given a,b, and x. The embeddings performance is measured by ability to accurately predict the solution to the analogy (whose solution is contained in a Google dataset).
+Again, using cosine similarity, the embeddings are utilized to solve analogies of the form A is to B as X is to Y, when given A, B, and X. The embeddings performance is measured by ability to accurately predict the solution to the analogy (whose solution is contained in a Google dataset).
 

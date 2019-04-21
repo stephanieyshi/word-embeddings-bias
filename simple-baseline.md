@@ -16,7 +16,7 @@ We find the following indirect bias on the following word pairs:
 We find that the original embeddings produce a clustering accuracy of 99.4%.
 
 ## Spearman Correlation for Word Similarity Task
-The spearman correlation on the word similarity task using the WordSimilarity-353 test set is 0.6857.
+The Spearman correlation on the word similarity task using the WordSimilarity-353 test set is 0.6857.
 
 ## Analogy Task Accuracy
 The embeddings produced an accuracy of 68% on the analogy task using the Google analogy test set.
