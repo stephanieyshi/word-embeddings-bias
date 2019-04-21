@@ -6,6 +6,7 @@ from sklearn.cluster import KMeans
 from sklearn import preprocessing
 from scipy.stats import pearsonr
 from scipy import stats
+import random
 import csv
 
 def get_embedding_dict(filename):
@@ -149,6 +150,44 @@ def get_similarities(embedding_dict, pairs):
     return {pair:compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]]) for pair in pairs}
 
 
+def get_analogies(filename):
+    analogies = list()
+    with open(filename, 'r') as f:
+        lines = f.read().split('\n')
+
+    for line in lines:
+        analogies.append(line.split(" "))
+
+    return analogies
+
+def solve_analogy(embedding_dict, a, b, x):
+    max_similarity = 0
+    most_similar_word = ""
+    v = embedding_dict[x] - embedding_dict[a] + embedding_dict[b]
+
+    for word in embedding_dict:
+        if word != x:
+            w = embedding_dict[word]
+            similarity = compute_cosine_similarity(v, w)
+            if similarity > max_similarity:
+                max_similarity = similarity
+                most_similar_word = word
+
+    return most_similar_word
+
+
+def solve_all_analogies(embedding_dict, tuples):
+    pred_labels = list()
+
+    for tup in tuples:
+        pred = solve_analogy(embedding_dict, tup[0], tup[1], tup[2])
+        pred_labels.append(pred)
+
+    return pred_labels
+
+def get_analogy_performance(true_labels, pred_labels):
+    return sum([1 for i in range(len(true_labels)) if true_labels[i] == pred_labels[i]]) / len(true_labels)
+
 if __name__ == '__main__':
     #necessary files
     embeddings_file = '../embeddings/debiased_w2v_gnews_small.txt'
@@ -199,5 +238,13 @@ if __name__ == '__main__':
                                [float(val) for val in similarity_dict.values()])
 
     print("Spearman Correlation for WS: " + str(spearman.correlation))
+    print()
 
+    analogies = get_analogies('../data/google_analogies.txt')
+    analogies = random.sample([tup for tup in analogies if tup[0] in embedding_dict and tup[1] in embedding_dict and
+                                                           tup[2] in embedding_dict and tup[3] in embedding_dict], 100)
+
+    pred_labels = solve_all_analogies(embedding_dict, analogies)
+    analogy_accuracy = get_analogy_performance([tup[3] for tup in analogies], pred_labels)
+    print("Google Analogies Accuracy: " + str(analogy_accuracy))
 
