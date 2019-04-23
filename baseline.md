@@ -24,7 +24,7 @@ We find the following indirect bias on the following word pairs:
 When compared to the biases of the original embeddings, we observed a Pearson correlation of 0.4711 with a p-value of 4.438e-19.
 
 ### Clustering Accuracy
-We find that the original embeddings produce a clustering accuracy of 74.2%.
+We find that the debiased embeddings produce a clustering accuracy of 74.2%.
 
 ### Spearman Correlation for Word Similarity Task
 The Spearman correlation on the word similarity task using the WordSimilarity-353 test set is 0.6826.
