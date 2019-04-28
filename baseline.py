@@ -193,16 +193,16 @@ def write_to_file(list, filename):
 def main():
     #collect data
     # embedding_dict = get_embedding_dict('embeddings/w2v_gnews_small.txt')
-    embedding_dict = get_embedding_dict('data/embeddings/breitbart_embedding_dict.txt')
+    embedding_dict = get_embedding_dict('embeddings/breitbart_embedding_dict.txt')
     g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
     gender_specific_words = read_json('data/gender_specific_full.json')
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
     equalize_pairs = read_json('data/equalize_pairs.json')
 
     #HARD DEBIASING
-    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
-    write_embeddings_to_file(embedding_dict, 'embeddings/debiased_breitbart_embedding_dict.txt')
+    # embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    # embedding_dict = equalize(embedding_dict, g, equalize_pairs)
+    # write_embeddings_to_file(embedding_dict, 'embeddings/debiased_breitbart_embedding_dict.txt')
 
 
     #FINDING MOST BIASED WORDS
