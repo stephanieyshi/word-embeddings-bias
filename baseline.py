@@ -36,7 +36,7 @@ def get_pca(pairs, embedding_dict):
         X.append(embedding_dict[pair[0]] - center)
         X.append(embedding_dict[pair[1]] - center)
 
-    pca = PCA(n_components=10)
+    pca = PCA(n_components=(len(pairs) * 2))
     pca.fit(X)
 
     return pca
@@ -194,10 +194,10 @@ def main():
     #collect data
     # embedding_dict = get_embedding_dict('embeddings/w2v_gnews_small.txt')
     embedding_dict = get_embedding_dict('embeddings/breitbart_embedding_dict.txt')
-    g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
-    gender_specific_words = read_json('data/gender_specific_full.json')
+    g = get_gender_direction(embedding_dict, 'data/definitional_pairs_politics.json')
+    gender_specific_words = read_json('data/politics_specific_full.json')
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
-    equalize_pairs = read_json('data/equalize_pairs.json')
+    equalize_pairs = read_json('data/equalize_pairs_politics.json')
 
     #HARD DEBIASING
     # embedding_dict = debias(embedding_dict, g, gender_neutral_words)
@@ -208,8 +208,8 @@ def main():
     #FINDING MOST BIASED WORDS
     female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
     male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
-    write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/breitbart_biased_female_500.txt')
-    write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/breitbart_biased_male_500.txt')
+    write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/breitbart_biased_left_500.txt')
+    write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/breitbart_biased_right_500.txt')
     # top 1000 biased words
     most_biased_words = sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500] + sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500]
 
