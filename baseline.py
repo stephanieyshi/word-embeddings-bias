@@ -207,8 +207,8 @@ def main():
     equalize_pairs = read_json('data/equalize_pairs_politics.json')
 
     #HARD DEBIASING
-    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
+    #embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    #embedding_dict = equalize(embedding_dict, g, equalize_pairs)
 
 
     #FINDING MOST BIASED WORDS
@@ -217,10 +217,10 @@ def main():
 
 
     # WRITE DATA TO FILE
-    write_g_to_file(g, 'embeddings/breitbart_politics_direction.txt')
+    # write_g_to_file(g, 'embeddings/breitbart_politics_direction.txt')
     # write_embeddings_to_file(embedding_dict, 'embeddings/debiased_breitbart_embedding_dict_politics.txt')
-    write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/breitbart_politics_democrat_500.txt')
-    write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/breitbart_politics_republican_500.txt')
+    write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/breitbart_politics_democrat_biased_500.txt')
+    write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/breitbart_politics_republican_biased_500.txt')
 
 
 if __name__ == '__main__':
