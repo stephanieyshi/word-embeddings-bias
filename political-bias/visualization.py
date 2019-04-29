@@ -89,14 +89,14 @@ def get_biases(embedding_dict, g, words, c=1):
 
 # Deprecated? Can get mean of the actual vector of biases
 def get_direct_bias(embedding_dict, g, words, c=1):
-	bias = 0
-	N = len(words)
+    bias = 0
+    N = len(words)
 
-	for word in words:
+    for word in words:
         if word in embedding_dict:
             bias += abs(compute_cosine_similarity(embedding_dict[word], g)) ** c
 
-	return (1 / N) * bias
+    return (1 / N) * bias
 
 
 def get_indirect_bias(embedding_dict, g, pairs):
@@ -154,7 +154,11 @@ def get_clustering_accuracy(labels):
 
 
 def get_similarities(embedding_dict, pairs):
-    return {pair:compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]]) if pair[0] in embedding_dict and pair[1] in embedding_dict for pair in pairs}
+    similarity_dict = {}
+    for pair in pairs:
+        if pair[0] in embedding_dict and pair[1] in embedding_dict:
+            similarities_dict[pair] = compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]])
+    return similarity_dict
 
 
 def get_analogies(filename):
@@ -191,6 +195,7 @@ def get_pca(pairs, embedding_dict):
             center = 0.5 * (embedding_dict[pair[0]] + embedding_dict[pair[1]])
             X.append(embedding_dict[pair[0]] - center)
             X.append(embedding_dict[pair[1]] - center)
+    print(X)
 
     pca = PCA(n_components=(len(pairs) * 2))
     pca.fit(X)
@@ -224,7 +229,7 @@ def get_analogy_performance(true_labels, pred_labels):
 
 if __name__ == '__main__':
     #necessary files
-    embeddings_file = '../embeddings/breitbart_embedding_dict.txt'
+    embeddings_file = '../embeddings/debiased_breitbart_embedding_dict.txt'
     gender_direction_file = '../embeddings/gender_direction.txt'
     professions_file = '../data/professions.json'
     biased_female_file = 'breitbart_biased_female_500.txt'
@@ -233,8 +238,8 @@ if __name__ == '__main__':
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
 
-    # embedding_dict = get_embedding_dict(embeddings_file)
-    embedding_dict = FastText.load_fasttext_format('model_breitbart.bin').wv
+    embedding_dict = get_embedding_dict(embeddings_file)
+    # embedding_dict = FastText.load_fasttext_format('model_breitbart.bin').wv
     g = get_gender_direction(embedding_dict, '../data/definitional_pairs.json')
     professions = [val[0] for val in read_json(professions_file)]
 
