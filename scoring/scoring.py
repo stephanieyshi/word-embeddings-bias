@@ -124,7 +124,7 @@ def plotPCA(embedding_dict, words):
     pca = PCA(n_components=2)
     points = pca.fit_transform(X)
 
-    labels = get_kmeans(points)
+    labels = get_kmeans(X)
 
     cdict = {i:['red','*'] if i < 500 else ['blue', 'o'] for i in range(len(X))}
 
@@ -188,14 +188,21 @@ def solve_all_analogies(embedding_dict, tuples):
 def get_analogy_performance(true_labels, pred_labels):
     return sum([1 for i in range(len(true_labels)) if true_labels[i] == pred_labels[i]]) / len(true_labels)
 
+
+def write_biases_to_file(biases, filename):
+    with open(filename, 'w') as f:
+        for bias in biases:
+            f.write(str(bias) + "\n")
+
+
 if __name__ == '__main__':
     #necessary files
-    embeddings_file = '../embeddings/debiased_w2v_gnews_small.txt'
-    gender_direction_file = '../embeddings/gender_direction.txt'
+    embeddings_file = '../embeddings/glove_small.txt'
+    gender_direction_file = '../embeddings/glove_gender_direction.txt'
     professions_file = '../data/professions.json'
-    biased_female_file = '../data/biased_female_500.txt'
-    biased_male_file = '../data/biased_male_500.txt'
-    original_biases_file = '../data/professions_biases.txt'
+    biased_female_file = '../data/glove_biased_female_500.txt'
+    biased_male_file = '../data/glove_biased_male_500.txt'
+    original_biases_file = '../data/glove_professions_biases.txt'
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
 
