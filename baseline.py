@@ -36,11 +36,7 @@ def get_pca(pairs, embedding_dict):
         X.append(embedding_dict[pair[0]] - center)
         X.append(embedding_dict[pair[1]] - center)
 
-<<<<<<< HEAD
     pca = PCA()
-=======
-    pca = PCA(n_components=(len(pairs) * 2))
->>>>>>> 9f2fe25c52a126f0b0d6b5c97662fc58344a0db1
     pca.fit(X)
 
     return pca
@@ -201,27 +197,29 @@ def write_g_to_file(g, filename):
 
 def main():
     #collect data
-    embedding_dict = get_embedding_dict('embeddings/w2v_gnews_small.txt')
+    embedding_dict = get_embedding_dict('embeddings/fasttext_small.txt')
     g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
     gender_specific_words = read_json('data/gender_specific_full.json')
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
     equalize_pairs = read_json('data/equalize_pairs_politics.json')
 
     #HARD DEBIASING
-    # embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    # embedding_dict = equalize(embedding_dict, g, equalize_pairs)
+    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
 
 
     #FINDING MOST BIASED WORDS
-    female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
-    male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
+    # female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
+    # male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
+    #print(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:100])
+    #print(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:100])
 
 
     # WRITE DATA TO FILE
-    # write_g_to_file(g, 'embeddings/glove_gender_direction.txt')
-    # write_embeddings_to_file(embedding_dict, 'embeddings/debiased_glove_small.txt')
-    # write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/glove_biased_female_500.txt')
-    # write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/glove_biased_male_500.txt')
+    #write_g_to_file(g, 'embeddings/fasttext_gender_direction.txt')
+    write_embeddings_to_file(embedding_dict, 'embeddings/debiased_fasttext_small.txt')
+    # write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'data/fasttext_biased_female_500.txt')
+    # write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'data/fasttext_biased_male_500.txt')
 
 
 if __name__ == '__main__':
