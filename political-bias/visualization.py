@@ -1,8 +1,8 @@
 import json
 import numpy as np
 from sklearn.decomposition import PCA
-import matplotlib
-matplotlib.use('PS')
+# import matplotlib
+# matplotlib.use('PS')
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn import preprocessing
@@ -234,18 +234,18 @@ def get_analogy_performance(true_labels, pred_labels):
 
 if __name__ == '__main__':
     #necessary files
-    embeddings_file = '../embeddings/debiased_breitbart_embedding_dict.txt'
+    embeddings_file = '../embeddings/breitbart_embedding_dict.txt'
     gender_direction_file = '../embeddings/gender_direction.txt'
     professions_file = '../data/professions.json'
-    biased_female_file = 'breitbart_biased_female_500.txt'
-    biased_male_file = 'breitbart_biased_male_500.txt'
+    biased_female_file = 'breitbart_politics_democrat_biased_500.txt'
+    biased_male_file = 'breitbart_politics_republican_biased_500.txt'
     original_biases_file = '../data/professions_biases.txt'
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
 
     embedding_dict = get_embedding_dict(embeddings_file)
     # embedding_dict = FastText.load_fasttext_format('model_breitbart.bin').wv
-    g = get_gender_direction(embedding_dict, '../data/definitional_pairs.json')
+    g = get_gender_direction(embedding_dict, '../data/definitional_pairs_politics.json')
     professions = [val[0] for val in read_json(professions_file)]
 
     print("++++++RESULTS++++++")
@@ -257,8 +257,8 @@ if __name__ == '__main__':
     print()
 
     #indirect bias
-    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'],
-             ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
+    pairs = [['gay', 'straight'], ['poor', 'rich'], ['black', 'white'],
+             ['atheist', 'Christian'], ['young', 'old'], ['educated', 'uneducated']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
     print()
