@@ -1,8 +1,8 @@
 import json
 import numpy as np
 from sklearn.decomposition import PCA
-import matplotlib
-matplotlib.use('PS')
+# import matplotlib
+# matplotlib.use('PS')
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn import preprocessing
@@ -10,7 +10,7 @@ from scipy.stats import pearsonr
 from scipy import stats
 import random
 import csv
-from gensim.models.fasttext import FastText
+# from gensim.models.fasttext import FastText
 
 def get_embedding_dict(filename):
     with open(filename, 'r') as f:
@@ -23,8 +23,6 @@ def get_embedding_dict(filename):
         word = split_line[0]
         vector = np.array([float(x) for x in split_line[1:]])
         embedding_dict[word] = vector
-        if word == 'her':
-            print(split_line)
 
     return embedding_dict
 
@@ -43,12 +41,16 @@ def get_gender_direction(filename):
     return vector
 
 
-def get_words(filename):
+def get_words(filename, embedding_dict):
     words = list()
     with open(filename, 'r') as f:
         lines = f.read().split('\n')
 
-    return lines[:len(lines) - 1]
+    for line in lines:
+        if line in embedding_dict:
+            words.append(line)
+
+    return words
 
 
 def read_wordsim(filename):
@@ -142,7 +144,7 @@ def plotPCA(embedding_dict, words):
         ax.scatter(points[i, 0], points[i, 1], c=cdict[i][0], marker=cdict[i][1])
 
     #uncomment to see PCA plot with clustering
-    #plt.show()
+    plt.show()
 
     return labels
 
@@ -159,7 +161,7 @@ def get_similarities(embedding_dict, pairs):
     similarity_dict = {}
     for pair in pairs:
         if pair[0] in embedding_dict and pair[1] in embedding_dict:
-            similarities_dict[pair] = compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]])
+            similarity_dict[pair] = compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]])
     return similarity_dict
 
 
@@ -178,8 +180,8 @@ def solve_analogy(embedding_dict, a, b, x):
     most_similar_word = ""
     if a in embedding_dict and b in embedding_dict and x in embedding_dict:
         v = embedding_dict[x] - embedding_dict[a] + embedding_dict[b]
-
-        for word in embedding_dict.vocab:
+        # print(v)
+        for word in embedding_dict:
             if word != x:
                 w = embedding_dict[word]
                 similarity = compute_cosine_similarity(v, w)
@@ -234,18 +236,18 @@ def get_analogy_performance(true_labels, pred_labels):
 
 if __name__ == '__main__':
     #necessary files
-    embeddings_file = '../embeddings/debiased_breitbart_embedding_dict.txt'
-    gender_direction_file = '../embeddings/gender_direction.txt'
+    embeddings_file = '../embeddings/breitbart_embedding_dict_politics.txt'
+    gender_direction_file = '../embeddings/breitbart_politics_direction.txt'
     professions_file = '../data/professions.json'
-    biased_female_file = 'breitbart_biased_female_500.txt'
-    biased_male_file = 'breitbart_biased_male_500.txt'
+    biased_female_file = 'breitbart_politics_democrat_500.txt'
+    biased_male_file = 'breitbart_politics_republican_500.txt'
     original_biases_file = '../data/professions_biases.txt'
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
 
     embedding_dict = get_embedding_dict(embeddings_file)
     # embedding_dict = FastText.load_fasttext_format('model_breitbart.bin').wv
-    g = get_gender_direction(embedding_dict, '../data/definitional_pairs.json')
+    g = get_gender_direction(embedding_dict, '../data/definitional_pairs_politics.json')
     professions = [val[0] for val in read_json(professions_file)]
 
     print("++++++RESULTS++++++")
@@ -257,24 +259,23 @@ if __name__ == '__main__':
     print()
 
     #indirect bias
-    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'],
-             ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
+    pairs = [['undocumented', 'illegal']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
     print()
 
     #clustering on 1000 most biased words
-    most_biased_words = get_words(biased_female_file) + get_words(biased_male_file)
+    most_biased_words = get_words(biased_female_file, embedding_dict) + get_words(biased_male_file, embedding_dict)
     labels = plotPCA(embedding_dict, most_biased_words)
     clustering_accuracy = get_clustering_accuracy(labels)
     print("Clustering Accuracy: " + str(clustering_accuracy))
     print()
 
     #get original biases and compute pearson
-    original_biases = [float(val) for val in get_words(original_biases_file)]
-    pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
-    print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
-    print()
+    # original_biases = [float(val) for val in get_words(original_biases_file, embedding_dict)]
+    # pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
+    # print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
+    # print()
 
     #word similarity task
     similarity_pairs = read_wordsim(word_similarity_file)
