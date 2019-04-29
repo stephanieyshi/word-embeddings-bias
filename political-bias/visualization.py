@@ -19,10 +19,12 @@ def get_embedding_dict(filename):
     embedding_dict = {}
 
     for line in lines:
-        split_line = line.split(' ')
+        split_line = line.strip().split(' ')
         word = split_line[0]
         vector = np.array([float(x) for x in split_line[1:]])
         embedding_dict[word] = vector
+        if word == 'her':
+            print(split_line)
 
     return embedding_dict
 
@@ -81,33 +83,36 @@ def get_pearson_correlation(v1, v2):
 def get_biases(embedding_dict, g, words, c=1):
     biases = []
     for word in words:
-        biases.append(abs(compute_cosine_similarity(embedding_dict[word], g)) ** c)
+        if word in embedding_dict:
+            biases.append(abs(compute_cosine_similarity(embedding_dict[word], g)) ** c)
 
     return biases
 
 
 # Deprecated? Can get mean of the actual vector of biases
 def get_direct_bias(embedding_dict, g, words, c=1):
-	bias = 0
-	N = len(words)
+    bias = 0
+    N = len(words)
 
-	for word in words:
-		bias += abs(compute_cosine_similarity(embedding_dict[word], g)) ** c
+    for word in words:
+        if word in embedding_dict:
+            bias += abs(compute_cosine_similarity(embedding_dict[word], g)) ** c
 
-	return (1 / N) * bias
+    return (1 / N) * bias
 
 
 def get_indirect_bias(embedding_dict, g, pairs):
     bias = dict()
 
     for pair in pairs:
-        w = embedding_dict[pair[0]] / np.linalg.norm(embedding_dict[pair[0]])
-        v = embedding_dict[pair[1]] / np.linalg.norm(embedding_dict[pair[1]])
-        w_g = np.dot(w, g) * g
-        v_g = np.dot(v, g) * g
+        if pair[0] in embedding_dict and pair[1] in embedding_dict:
+            w = embedding_dict[pair[0]] / np.linalg.norm(embedding_dict[pair[0]])
+            v = embedding_dict[pair[1]] / np.linalg.norm(embedding_dict[pair[1]])
+            w_g = np.dot(w, g) * g
+            v_g = np.dot(v, g) * g
 
-        beta = (1 / np.dot(w, v)) * (np.dot(w, v) - compute_cosine_similarity(w - w_g, v - v_g))
-        bias[(pair[0], pair[1])] = beta
+            beta = (1 / np.dot(w, v)) * (np.dot(w, v) - compute_cosine_similarity(w - w_g, v - v_g))
+            bias[(pair[0], pair[1])] = beta
 
     return bias
 
@@ -122,7 +127,8 @@ def plotPCA(embedding_dict, words):
     X = []
 
     for word in words:
-        X.append(embedding_dict[word])
+        if word in embedding_dict:
+            X.append(embedding_dict[word])
 
     pca = PCA(n_components=2)
     points = pca.fit_transform(X)
@@ -150,7 +156,11 @@ def get_clustering_accuracy(labels):
 
 
 def get_similarities(embedding_dict, pairs):
-    return {pair:compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]]) for pair in pairs}
+    similarity_dict = {}
+    for pair in pairs:
+        if pair[0] in embedding_dict and pair[1] in embedding_dict:
+            similarities_dict[pair] = compute_cosine_similarity(embedding_dict[pair[0]], embedding_dict[pair[1]])
+    return similarity_dict
 
 
 def get_analogies(filename):
@@ -166,25 +176,31 @@ def get_analogies(filename):
 def solve_analogy(embedding_dict, a, b, x):
     max_similarity = 0
     most_similar_word = ""
-    v = embedding_dict[x] - embedding_dict[a] + embedding_dict[b]
+    if a in embedding_dict and b in embedding_dict and x in embedding_dict:
+        v = embedding_dict[x] - embedding_dict[a] + embedding_dict[b]
 
-    for word in embedding_dict.vocab:
-        if word != x:
-            w = embedding_dict[word]
-            similarity = compute_cosine_similarity(v, w)
-            if similarity > max_similarity:
-                max_similarity = similarity
-                most_similar_word = word
+        for word in embedding_dict.vocab:
+            if word != x:
+                w = embedding_dict[word]
+                similarity = compute_cosine_similarity(v, w)
+                if similarity > max_similarity:
+                    max_similarity = similarity
+                    most_similar_word = word
 
     return most_similar_word
 
 def get_pca(pairs, embedding_dict):
+    print('getting pca')
     X = []
 
     for pair in pairs:
-        center = 0.5 * (embedding_dict[pair[0]] + embedding_dict[pair[1]])
-        X.append(embedding_dict[pair[0]] - center)
-        X.append(embedding_dict[pair[1]] - center)
+        if pair[0] in embedding_dict and pair[1] in embedding_dict:
+            # print(embedding_dict[pair[0]])
+            center = 0.5 * (embedding_dict[pair[0]] + embedding_dict[pair[1]])
+            # print(center)
+            X.append(embedding_dict[pair[0]] - center)
+            X.append(embedding_dict[pair[1]] - center)
+    # print(X)
 
     pca = PCA(n_components=(len(pairs) * 2))
     pca.fit(X)
@@ -218,7 +234,7 @@ def get_analogy_performance(true_labels, pred_labels):
 
 if __name__ == '__main__':
     #necessary files
-    embeddings_file = '../embeddings/breitbart_embedding_dict.txt'
+    embeddings_file = '../embeddings/debiased_breitbart_embedding_dict.txt'
     gender_direction_file = '../embeddings/gender_direction.txt'
     professions_file = '../data/professions.json'
     biased_female_file = 'breitbart_biased_female_500.txt'
@@ -227,8 +243,8 @@ if __name__ == '__main__':
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
 
-    # embedding_dict = get_embedding_dict(embeddings_file)
-    embedding_dict = FastText.load_fasttext_format('model_breitbart.bin').wv
+    embedding_dict = get_embedding_dict(embeddings_file)
+    # embedding_dict = FastText.load_fasttext_format('model_breitbart.bin').wv
     g = get_gender_direction(embedding_dict, '../data/definitional_pairs.json')
     professions = [val[0] for val in read_json(professions_file)]
 
