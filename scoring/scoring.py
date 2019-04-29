@@ -132,8 +132,13 @@ def plotPCA(embedding_dict, words):
     for i in range(len(X)):
         ax.scatter(points[i, 0], points[i, 1], c=cdict[i][0], marker=cdict[i][1])
 
+    for i in range(10):
+        ax.annotate(words[i], (points[i, 0], points[i, 1]))
+
+    for i in range(500, 511):
+        ax.annotate(words[i], (points[i, 0], points[i, 1]))
     #uncomment to see PCA plot with clustering
-    #plt.show()
+    plt.show()
 
     return labels
 
@@ -212,13 +217,13 @@ if __name__ == '__main__':
 
     print("++++++RESULTS++++++")
 
-    #direct bias
+    ##direct bias
     biases = get_biases(embedding_dict, g, professions)
     direct_bias = np.mean(biases)
     print("Direct Bias: " + str(direct_bias))
     print()
-
-    #indirect bias
+#
+    ##indirect bias
     pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], 
              ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
@@ -233,27 +238,27 @@ if __name__ == '__main__':
     print()
 
     #get original biases and compute pearson
-    original_biases = [float(val) for val in get_words(original_biases_file)]
-    pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
-    print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
-    print()
+    # original_biases = [float(val) for val in get_words(original_biases_file)]
+    # pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
+    # print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
+    # print()
 
     #word similarity task
     similarity_pairs = read_wordsim(word_similarity_file)
     similarity_pairs = {key:similarity_pairs[key] for key in similarity_pairs 
                             if key[0] in embedding_dict and key[1] in embedding_dict}
-
+    
     similarity_dict = get_similarities(embedding_dict, list(similarity_pairs.keys()))
     spearman = stats.spearmanr([float(val) for val in similarity_pairs.values()], 
                                [float(val) for val in similarity_dict.values()])
-
+    
     print("Spearman Correlation for WS: " + str(spearman.correlation))
     print()
-
+    
     analogies = get_analogies(analogies_file)
     analogies = random.sample([tup for tup in analogies if tup[0] in embedding_dict and tup[1] in embedding_dict and
                                                            tup[2] in embedding_dict and tup[3] in embedding_dict], 100)
-
+    
     pred_labels = solve_all_analogies(embedding_dict, analogies)
     analogy_accuracy = get_analogy_performance([tup[3] for tup in analogies], pred_labels)
     print("Google Analogies Accuracy: " + str(analogy_accuracy))
