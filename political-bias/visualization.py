@@ -19,10 +19,12 @@ def get_embedding_dict(filename):
     embedding_dict = {}
 
     for line in lines:
-        split_line = line.split(' ')
+        split_line = line.strip().split(' ')
         word = split_line[0]
         vector = np.array([float(x) for x in split_line[1:]])
         embedding_dict[word] = vector
+        if word == 'her':
+            print(split_line)
 
     return embedding_dict
 
@@ -188,14 +190,17 @@ def solve_analogy(embedding_dict, a, b, x):
     return most_similar_word
 
 def get_pca(pairs, embedding_dict):
+    print('getting pca')
     X = []
 
     for pair in pairs:
         if pair[0] in embedding_dict and pair[1] in embedding_dict:
+            # print(embedding_dict[pair[0]])
             center = 0.5 * (embedding_dict[pair[0]] + embedding_dict[pair[1]])
+            # print(center)
             X.append(embedding_dict[pair[0]] - center)
             X.append(embedding_dict[pair[1]] - center)
-    print(X)
+    # print(X)
 
     pca = PCA(n_components=(len(pairs) * 2))
     pca.fit(X)
