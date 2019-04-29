@@ -36,7 +36,11 @@ def get_pca(pairs, embedding_dict):
         X.append(embedding_dict[pair[0]] - center)
         X.append(embedding_dict[pair[1]] - center)
 
+<<<<<<< HEAD
     pca = PCA()
+=======
+    pca = PCA(n_components=(len(pairs) * 2))
+>>>>>>> 9f2fe25c52a126f0b0d6b5c97662fc58344a0db1
     pca.fit(X)
 
     return pca
@@ -201,17 +205,16 @@ def main():
     g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
     gender_specific_words = read_json('data/gender_specific_full.json')
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
-    equalize_pairs = read_json('data/equalize_pairs.json')
+    equalize_pairs = read_json('data/equalize_pairs_politics.json')
 
-    # HARD DEBIASING
-    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
+    #HARD DEBIASING
+    # embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    # embedding_dict = equalize(embedding_dict, g, equalize_pairs)
 
 
     #FINDING MOST BIASED WORDS
-    # female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
-    # male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
-
+    female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
+    male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
 
 
     # WRITE DATA TO FILE
