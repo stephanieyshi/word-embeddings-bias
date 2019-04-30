@@ -144,7 +144,7 @@ def plotPCA(embedding_dict, words):
         ax.scatter(points[i, 0], points[i, 1], c=cdict[i][0], marker=cdict[i][1])
 
     #uncomment to see PCA plot with clustering
-    plt.show()
+    # plt.show()
 
     return labels
 
@@ -236,11 +236,11 @@ def get_analogy_performance(true_labels, pred_labels):
 
 if __name__ == '__main__':
     #necessary files
-    embeddings_file = '../embeddings/breitbart_embedding_dict.txt'
-    gender_direction_file = '../embeddings/gender_direction.txt'
+    embeddings_file = '../embeddings/debiased_breitbart_embedding_dict_politics.txt'
+    gender_direction_file = '../embeddings/breitbart_politics_direction.txt'
     professions_file = '../data/professions.json'
-    biased_female_file = 'breitbart_politics_democrat_biased_500.txt'
-    biased_male_file = 'breitbart_politics_republican_biased_500.txt'
+    biased_female_file = 'breitbart_politics_democrat_500.txt'
+    biased_male_file = 'breitbart_politics_republican_500.txt'
     original_biases_file = '../data/professions_biases.txt'
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
@@ -259,8 +259,8 @@ if __name__ == '__main__':
     print()
 
     #indirect bias
-    pairs = [['gay', 'straight'], ['poor', 'rich'], ['black', 'white'],
-             ['atheist', 'Christian'], ['young', 'old'], ['educated', 'uneducated']]
+    pairs = [['gay', 'atheist'], ['black', 'poor'], ['young', 'woman'],
+             ['white', 'rich'], ['old', 'man'], ['straight', 'religious']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
     print()
