@@ -1,10 +1,6 @@
 import json
 import numpy as np
 from sklearn.decomposition import PCA
-from scoring.scoring import *
-import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
-
 
 def get_embedding_dict(filename):
     with open(filename, 'r') as f:
@@ -16,7 +12,6 @@ def get_embedding_dict(filename):
         split_line = line.strip().split(' ')
         if (len(split_line) > 0):
             word = split_line[0]
-            # print(split_line)
             vector = np.array([float(x) for x in split_line[1:]])
             embedding_dict[word] = vector
 
@@ -142,10 +137,10 @@ def write_g_to_file(g, filename):
 
 def main():
     #data files
-    embeddings_file = 'embeddings/biased_articles_sample_embedding_dict_politics.txt'
-    definitional_pairs_file = 'data/definitional_pairs_politics.json'
-    specific_words_file = 'data/politics_specific_full.json' #non-neutral
-    equalize_pairs_file = 'data/equalize_pairs_politics.json'
+    embeddings_file = 'embeddings/glove_small.txt'
+    definitional_pairs_file = 'data/definitional_pairs.json'
+    specific_words_file = 'data/gender_specific_full.json' #non-neutral
+    equalize_pairs_file = 'data/equalize_pairs.json'
 
     #collect data
     print("Collecting Data...")
@@ -155,22 +150,24 @@ def main():
     gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
     equalize_pairs = read_json(equalize_pairs_file)
 
-    # debias embeddings
-    print("Debiasing...")
-    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
-
     #finding most biased words
     print("Finding Biased Words...")
     female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
     male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
+    sorted_dict = sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:10]
+    print(sorted_dict)
+    print(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:10])
+
+    # debias embeddings
+    print("Debiasing...")
+    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
 
     # files to write to
     gender_direction_file = 'embeddings/articles_sample_politics_direction.txt'
     debiased_embeddings_file = 'embeddings/debiased_articles_sample_embedding_dict_politics.txt'
     female_biased_file = 'political-bias/articles_sample_politics_democrat_debiased_500.txt'
     male_biased_file = 'political-bias/articles_sample_politics_republican_debiased_500.txt'
-
 
     # write data to files
     #write_g_to_file(g, gender_direction_file)
