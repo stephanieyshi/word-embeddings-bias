@@ -135,10 +135,8 @@ def plotPCA(embedding_dict, words):
     for i in range(10):
         ax.annotate(words[i], (points[i, 0], points[i, 1]))
 
-    for i in range(500, 511):
-        ax.annotate(words[i], (points[i, 0], points[i, 1]))
     #uncomment to see PCA plot with clustering
-    plt.show()
+    #plt.show()
 
     return labels
 
@@ -201,7 +199,7 @@ def write_biases_to_file(biases, filename):
 
 
 if __name__ == '__main__':
-    #necessary files
+    # data files
     embeddings_file = '../embeddings/glove_small.txt'
     gender_direction_file = '../embeddings/glove_gender_direction.txt'
     professions_file = '../data/professions.json'
@@ -211,39 +209,34 @@ if __name__ == '__main__':
     word_similarity_file = '../data/combined.csv'
     analogies_file = '../data/google_analogies.txt'
 
+    # collect data
+    print("Collecting Data...")
     embedding_dict = get_embedding_dict(embeddings_file)
     g = get_gender_direction(gender_direction_file)
     professions = [val[0] for val in read_json(professions_file)]
 
-    print("++++++RESULTS++++++")
-
-    ##direct bias
+    # evaluating bias
+    print("Evaluating Bias...")
     biases = get_biases(embedding_dict, g, professions)
     direct_bias = np.mean(biases)
     print("Direct Bias: " + str(direct_bias))
-    print()
-#
-    ##indirect bias
-    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], 
-             ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
+
+    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
-    print()
 
-    #clustering on 1000 most biased words
     most_biased_words = get_words(biased_female_file) + get_words(biased_male_file)
     labels = plotPCA(embedding_dict, most_biased_words)
     clustering_accuracy = get_clustering_accuracy(labels)
     print("Clustering Accuracy: " + str(clustering_accuracy))
     print()
 
-    #get original biases and compute pearson
-    # original_biases = [float(val) for val in get_words(original_biases_file)]
-    # pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
-    # print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
-    # print()
+    original_biases = [float(val) for val in get_words(original_biases_file)]
+    pearson_correlation, p_value = get_pearson_correlation(original_biases, biases)
+    print("Pearson Correlation: " + str(pearson_correlation) + " with p-value: " + str(p_value))
 
-    #word similarity task
+    # evaluating quality
+    print("Evaluating Quality...")
     similarity_pairs = read_wordsim(word_similarity_file)
     similarity_pairs = {key:similarity_pairs[key] for key in similarity_pairs 
                             if key[0] in embedding_dict and key[1] in embedding_dict}
@@ -253,7 +246,6 @@ if __name__ == '__main__':
                                [float(val) for val in similarity_dict.values()])
     
     print("Spearman Correlation for WS: " + str(spearman.correlation))
-    print()
     
     analogies = get_analogies(analogies_file)
     analogies = random.sample([tup for tup in analogies if tup[0] in embedding_dict and tup[1] in embedding_dict and
