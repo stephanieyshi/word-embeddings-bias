@@ -57,27 +57,57 @@ def get_neutral_embeddings(embedding_dict, gender_specific_words):
 
 
 def main():
-    embedding_dict = get_embedding_dict('embeddings/w2v_gnews_small.txt')
-    g = get_gender_direction(embedding_dict, 'data/definitional_pairs.json')
-    gender_specific_words = read_json('data/gender_specific_full.json')
-    gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words]
-    professions = [data[0] for data in read_json('data/professions.json')]
+    #data files
+    embeddings_file = 'embeddings/w2v_gnews_small.txt'
+    definitional_pairs_file = 'data/definitional_pairs.json'
+    specific_words_file = 'data/gender_specific_full.json' #non-neutral
+    professions_file = 'data/professions.json'
+    biased_female_file = 'data/gnews_biased_female_500.txt'
+    biased_male_file = 'data/gnews_biased_male_500.txt'
+    word_similarity_file = 'data/combined.csv'
+    analogies_file = 'data/google_analogies.txt'
 
-    biased_biases = get_biases(embedding_dict, g, professions)
-    direct_bias = np.mean(biased_biases)
-    # direct_bias = get_direct_bias(embedding_dict, g, professions)
+    #collect data
+    print("Collecting Data...")
+    embedding_dict = get_embedding_dict(embeddings_file)
+    g = get_gender_direction(embedding_dict, definitional_pairs_file)
+    gender_specific_words = read_json(specific_words_file)
+    gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words]
+    professions = [data[0] for data in read_json(professions_file)]
+
+    print("Evaluating Bias...")
+    biases = get_biases(embedding_dict, g, professions)
+    direct_bias = np.mean(biases)
     print("Direct Bias: " + str(direct_bias))
 
-    neutral_pairs = read_json('data/equalize_pairs.json')
-    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball'], ['businessman', 'football'], ['businessman', 'softball'], ['maestro', 'football']]
+    pairs = [['receptionist', 'softball'], ['waitress', 'softball'], ['homemaker', 'softball']]
     indirect_bias = get_indirect_bias(embedding_dict, g, pairs)
     print("Indirect Bias: " + str(indirect_bias))
 
-    # Compute the Pearson Correlation for biased embeddings vs de-biased embeddings
-    # TODO: Implement unbiased_biases or read in unbiased embeddings
-    unbiased_biases = biased_biases
-    pearson_correlation, p_value = get_pearson_correlation(biased_biases, unbiased_biases)
-    print("Pearson Correlation: " + str(pearson_correlation) + " with p_value: " + str(p_value))
+    most_biased_words = get_words(biased_female_file) + get_words(biased_male_file)
+    labels = plotPCA(embedding_dict, most_biased_words)
+    clustering_accuracy = get_clustering_accuracy(labels)
+    print("Clustering Accuracy: " + str(clustering_accuracy))
+    print()
+
+    print("Evaluating Quality...")
+    similarity_pairs = read_wordsim(word_similarity_file)
+    similarity_pairs = {key:similarity_pairs[key] for key in similarity_pairs 
+                            if key[0] in embedding_dict and key[1] in embedding_dict}
+    
+    similarity_dict = get_similarities(embedding_dict, list(similarity_pairs.keys()))
+    spearman = stats.spearmanr([float(val) for val in similarity_pairs.values()], 
+                               [float(val) for val in similarity_dict.values()])
+    
+    print("Spearman Correlation for Word Similarity: " + str(spearman.correlation))
+    
+    analogies = get_analogies(analogies_file)
+    analogies = random.sample([tup for tup in analogies if tup[0] in embedding_dict and tup[1] in embedding_dict and
+                                                           tup[2] in embedding_dict and tup[3] in embedding_dict], 100)
+    
+    pred_labels = solve_all_analogies(embedding_dict, analogies)
+    analogy_accuracy = get_analogy_performance([tup[3] for tup in analogies], pred_labels)
+    print("Google Analogies Accuracy: " + str(analogy_accuracy))
 
 
 if __name__ == '__main__':
