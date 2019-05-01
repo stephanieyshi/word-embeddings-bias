@@ -100,19 +100,6 @@ def equalize(embedding_dict, g, pairs):
 
     return embedding_dict
 
-#FIX THIS
-def generate_analogies(embedding_dict, g, words):
-    analogies_dict = dict()
-    for i in range(len(words)):
-        word1 = words[i]
-        for j in range(i + 1, len(words)):
-            word2 = words[j]
-            diff_vec = embedding_dict[word1] - embedding_dict[word2]
-            similarity = compute_cosine_similarity(g, diff_vec)
-            analogies_dict[(word1, word2)] = similarity
-
-    return analogies_dict
-
 
 def most_biased(embedding_dict, g, words, dir=True):
     bias_dict = dict()
@@ -134,51 +121,6 @@ def most_biased(embedding_dict, g, words, dir=True):
     return bias_dict
 
 
-def get_kmeans(points):
-    kmeans = KMeans(n_clusters=2, random_state=0).fit(points)
-    labels = kmeans.labels_
-    return labels
-
-def plotPCA(embedding_dict, words):
-    X = []
-
-    for word in words:
-        X.append(embedding_dict[word])
-
-    pca = PCA(n_components=2)
-    points = pca.fit_transform(X)
-
-    labels = get_kmeans(points)
-
-    cdict = {i:['red','*'] if i < 500 else ['blue', 'o'] for i in range(len(X))}
-
-    fig,ax = plt.subplots(figsize=(8,8))
-    for i in range(len(X)):
-        ax.scatter(points[i, 0], points[i, 1], c=cdict[i][0], marker=cdict[i][1])
-
-    #plt.show()
-
-    return labels
-
-def get_clustering_accuracy(labels):
-    correct_labels = [1 if i < 500 else 0 for i in range(len(labels))]
-    correct = sum(correct_labels == labels)
-    accuracy = correct / len(labels)
-
-    return max(accuracy, 1 - accuracy)
-
-
-def solve_analogy(embedding_dict):
-    vector = embedding_dict['hospital'] - embedding_dict['doctor'] + embedding_dict['teacher']
-
-    solution_dict = dict()
-
-    for word in embedding_dict:
-        solution_dict[word] = compute_cosine_similarity(vector, embedding_dict[word])
-
-    return solution_dict
-
-
 def write_embeddings_to_file(embedding_dict, filename):
     with open(filename, 'w') as f:
         for word in embedding_dict:
@@ -187,7 +129,7 @@ def write_embeddings_to_file(embedding_dict, filename):
             vector_string = " ".join(vector)
             f.write(vector_string + "\n")
 
-def write_to_file(list, filename):
+def write_words_to_file(list, filename):
     with open(filename, 'w') as f:
         for word in list:
             f.write(word + "\n")
@@ -199,30 +141,42 @@ def write_g_to_file(g, filename):
         f.write(vec_string)
 
 def main():
-    #collect data
-    embedding_dict = get_embedding_dict('embeddings/biased_articles_sample_embedding_dict_politics.txt')
-    g = get_gender_direction(embedding_dict, 'data/definitional_pairs_politics.json')
-    gender_specific_words = read_json('data/politics_specific_full.json')
-    gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
-    equalize_pairs = read_json('data/equalize_pairs_politics.json')
+    #data files
+    embeddings_file = 'embeddings/biased_articles_sample_embedding_dict_politics.txt'
+    definitional_pairs_file = 'data/definitional_pairs_politics.json'
+    specific_words_file = 'data/politics_specific_full.json' #non-neutral
+    equalize_pairs_file = 'data/equalize_pairs_politics.json'
 
-    # HARD DEBIASING
+    #collect data
+    print("Collecting Data...")
+    embedding_dict = get_embedding_dict(embeddings_file)
+    g = get_gender_direction(embedding_dict, definitional_pairs_file)
+    gender_specific_words = read_json(specific_words_file)
+    gender_neutral_words = [word for word in embedding_dict if word not in gender_specific_words and word.islower()]
+    equalize_pairs = read_json(equalize_pairs_file)
+
+    # debias embeddings
+    print("Debiasing...")
     embedding_dict = debias(embedding_dict, g, gender_neutral_words)
     embedding_dict = equalize(embedding_dict, g, equalize_pairs)
 
-
-    #FINDING MOST BIASED WORDS
+    #finding most biased words
+    print("Finding Biased Words...")
     female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
     male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
-    #print(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:100])
-    #print(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:100])
+
+    # files to write to
+    gender_direction_file = 'embeddings/articles_sample_politics_direction.txt'
+    debiased_embeddings_file = 'embeddings/debiased_articles_sample_embedding_dict_politics.txt'
+    female_biased_file = 'political-bias/articles_sample_politics_democrat_debiased_500.txt'
+    male_biased_file = 'political-bias/articles_sample_politics_republican_debiased_500.txt'
 
 
-    # WRITE DATA TO FILE
-    # write_g_to_file(g, 'embeddings/articles_sample_politics_direction.txt')
-    write_embeddings_to_file(embedding_dict, 'embeddings/debiased_articles_sample_embedding_dict_politics.txt')
-    write_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], 'political-bias/articles_sample_politics_democrat_debiased_500.txt')
-    write_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], 'political-bias/articles_sample_politics_republican_debiased_500.txt')
+    # write data to files
+    #write_g_to_file(g, gender_direction_file)
+    #write_embeddings_to_file(embedding_dict, debiased_embeddings_file)
+    #write_words_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], female_biased_file)
+    #write_words_to_file(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:500], male_biased_file)
 
 
 if __name__ == '__main__':
