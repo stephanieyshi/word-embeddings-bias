@@ -155,21 +155,20 @@ def main():
     female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
     male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
     sorted_dict = sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:10]
-    print(sorted_dict)
-    print(sorted(male_bias_dict, key=male_bias_dict.get, reverse=True)[:10])
 
     # debias embeddings
     print("Debiasing...")
-    embedding_dict = debias(embedding_dict, g, gender_neutral_words)
-    embedding_dict = equalize(embedding_dict, g, equalize_pairs)
+    #embedding_dict = debias(embedding_dict, g, gender_neutral_words)
+    #embedding_dict = equalize(embedding_dict, g, equalize_pairs)
 
     # files to write to
-    gender_direction_file = 'embeddings/articles_sample_politics_direction.txt'
-    debiased_embeddings_file = 'embeddings/debiased_articles_sample_embedding_dict_politics.txt'
-    female_biased_file = 'political-bias/articles_sample_politics_democrat_debiased_500.txt'
-    male_biased_file = 'political-bias/articles_sample_politics_republican_debiased_500.txt'
+    gender_direction_file = 'embeddings/glove_gender_direction.txt'
+    debiased_embeddings_file = 'embeddings/debiased_glove_small.txt'
+    female_biased_file = 'data/glove_biased_female_500.txt'
+    male_biased_file = 'data/glove_biased_male_500.txt'
 
     # write data to files
+    print("Writing to Files...")
     #write_g_to_file(g, gender_direction_file)
     #write_embeddings_to_file(embedding_dict, debiased_embeddings_file)
     #write_words_to_file(sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:500], female_biased_file)
