@@ -137,7 +137,7 @@ def write_g_to_file(g, filename):
 
 def main():
     #data files
-    embeddings_file = 'embeddings/glove_small.txt'
+    embeddings_file = 'bert_small.txt'
     definitional_pairs_file = 'data/definitional_pairs.json'
     specific_words_file = 'data/gender_specific_full.json' #non-neutral
     equalize_pairs_file = 'data/equalize_pairs.json'
@@ -154,7 +154,8 @@ def main():
     print("Finding Biased Words...")
     female_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, True)
     male_bias_dict = most_biased(embedding_dict, g, gender_neutral_words, False)
-    sorted_dict = sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:10]
+    sorted_dict = sorted(female_bias_dict, key=female_bias_dict.get, reverse=True)[:50]
+    print(sorted_dict)
 
     # debias embeddings
     print("Debiasing...")

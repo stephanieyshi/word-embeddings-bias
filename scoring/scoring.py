@@ -53,7 +53,7 @@ def read_wordsim(filename):
         next(csvfile)
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
-            pairs_dict[(row[0], row[1])] = row[2]
+            pairs_dict[(row[0], row[1])] = float(row[2])
 
     return pairs_dict
 
