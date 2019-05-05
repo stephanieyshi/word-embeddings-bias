@@ -28,7 +28,7 @@ Our data comes from a number of sources.  The first source is from the *Man is t
 
 - Embeddings trained from a combination of the Wikipedia 2014 dump and the Gigaword 5 corpus using the GLoVe algorithm. The 6B token, 400K vocab version can be downloaded [here](http://nlp.stanford.edu/data/glove.6B.zip). The 42B token, 1.9M vocab version can be downloaded [here](http://nlp.stanford.edu/data/glove.42B.300d.zip). The 840B, 2.2M vocab version can be downloaded [here](http://nlp.stanford.edu/data/glove.840B.300d.zip).
 
-- Twitter embeddings trained using the GLoVe algorithm. These files can be downloaded [here](http://nlp.stanford.edu/data/glove.twitter.27B.zip).
+- Twitter embeddings trained using the GLoVe algorithm. These files can be downloaded [here](http://nlp.stanford.edu/data/glove.twitter.27B.zip). Alternatively, you can use the Magnitude library file which can be found [here](https://github.com/plasticityai/magnitude)
 
 - Word embeddings for historical English text (Hamilton, Leskovec, and Jurafsky, 2018) spanning all decades from 1800 to 2000. These are derived from Google N-Gram word2vec vectors and can be downloaded [here](http://snap.stanford.edu/historical_embeddings/eng-all_sgns.zip).
 
